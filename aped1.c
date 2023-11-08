@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <windows.h>
+
 
 // Estrutura para representar um funcionário
-struct Employee {
+ struct Employee {
     char name[100];
     char address[100];
     char birthdate[20];
@@ -52,6 +52,19 @@ void insertEmployee(struct Employee** head, struct Employee* newEmployee) {
             current->next->prev = newEmployee;
         }
         current->next = newEmployee;
+    }
+}
+
+// Função para exibir a lista de funcionários
+void salar (struct Employee* head) {
+    struct Employee* current = head;
+    
+
+    printf("Lista de funcionários ordenada por nome:\n");
+    while (current != NULL) {
+
+        printf("Salário: %.2f\n",  current->salary);
+        current = current->next;
     }
 }
 
@@ -106,7 +119,6 @@ void displayEmployeesSortedByNameReverse(struct Employee* head) {
 
 int main() {
 
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
     FILE* file = fopen("Dados_Funcionarios.csv", "r");
     if (file == NULL) {
@@ -119,7 +131,7 @@ int main() {
 
     while (fgets(line, sizeof(line), file)) {
         struct Employee* newEmployee = (struct Employee*)malloc(sizeof(struct Employee));
-        sscanf(line, "%99[^,],%99[^,],%19[^,],%f", newEmployee->name, newEmployee->address, newEmployee->birthdate, &newEmployee->salary);
+        sscanf(line, "\"%99[^\"]\",\"%11[^\"]\",\"%99[^\"]\",%d,\"%f\"", newEmployee->name, newEmployee->birthdate, newEmployee->address, &newEmployee->addressNumber, &newEmployee->salary);
         newEmployee->next = NULL;
         newEmployee->prev = NULL;
 
@@ -128,7 +140,10 @@ int main() {
 
     fclose(file);
 
-    displayEmployees(head);
+   // displayEmployees(head);
+
+   salar (head);
+
 
         float valormin, valormax;
     printf("Digite o valor minimo do intervalo salarial: ");
@@ -136,32 +151,25 @@ int main() {
     printf("Digite o valor maximo do intervalo salarial: ");
     scanf("%f", &valormax);
 
-        SetConsoleTextAttribute(hConsole, FOREGROUND_BLUE);
 
 
     searchBySalaryRange(head, valormin, valormax);
 
-        SetConsoleTextAttribute(hConsole, FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 
 
-    SetConsoleTextAttribute(hConsole, FOREGROUND_GREEN);
 
     printf ("\n\nFUNCIONARIOS EM ORDEM ALFABETICA \n \n");
 
-        displayEmployeesSortedByName(head);
+      //  displayEmployeesSortedByName(head);
 
-
-    SetConsoleTextAttribute(hConsole, FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 
    
-       SetConsoleTextAttribute(hConsole, FOREGROUND_RED);
 
     printf ("\n\n FUNCIONARIOS EM ORDEM ALFABETICA Z - A\n \n");
 
-   displayEmployeesSortedByNameReverse(head); // Exibe a lista de funcionários de Z a A
+   //displayEmployeesSortedByNameReverse(head); // Exibe a lista de funcionários de Z a A
 
     // Libere a memória alocada para os funcionários (implementação de limpeza adequada deve ser feita)
-    SetConsoleTextAttribute(hConsole, FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 
     return 0;
 }
