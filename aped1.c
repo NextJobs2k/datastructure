@@ -8,6 +8,7 @@
     char name[100];
     char address[100];
     char birthdate[20];
+    int addressNumber;
     float salary;
     struct Employee* next;
     struct Employee* prev;
@@ -33,6 +34,12 @@ void searchBySalaryRange(struct Employee* head, float valormin, float valormax) 
 // Função para inserir um funcionário ordenadamente na lista
 void insertEmployee(struct Employee** head, struct Employee* newEmployee) {
     struct Employee* current = *head;
+
+
+
+    if (current != NULL) {
+        current = current->next;
+    }
 
     if (*head == NULL || strcmp(newEmployee->name, current->name) < 0) {
         newEmployee->next = current;
@@ -63,7 +70,8 @@ void salar (struct Employee* head) {
     printf("Lista de funcionários ordenada por nome:\n");
     while (current != NULL) {
 
-        printf("Salário: %.2f\n",  current->salary);
+        printf("Nome: %s, Endereço: %s, %d,  Data de Nascimento: %s, Salário: %.2f\n",current->name, current->address, current->addressNumber, current->birthdate, current->salary);
+
         current = current->next;
     }
 }
@@ -89,7 +97,7 @@ void displayEmployeesSortedByName(struct Employee* head) {
 
     printf("Lista de funcionários ordenada por nome (A a Z):\n");
     while (current != NULL) {
-        printf("Nome: %s, Endereço: %s, Data de Nascimento: %s, Salário: %.2f\n",
+        printf("Nome: %s, Endereço: %s, Data de Nascimento: %s, Salário: %f\n",
 
                current->name, current->address, current->birthdate, current->salary);
         current = current->next;
@@ -119,7 +127,7 @@ void displayEmployeesSortedByNameReverse(struct Employee* head) {
 
 int main() {
 
-
+  
     FILE* file = fopen("Dados_Funcionarios.csv", "r");
     if (file == NULL) {
         perror("Erro ao abrir o arquivo");
@@ -130,9 +138,13 @@ int main() {
     char line[256];
 
     while (fgets(line, sizeof(line), file)) {
+
+        
+
         struct Employee* newEmployee = (struct Employee*)malloc(sizeof(struct Employee));
-        sscanf(line, "\"%99[^\"]\",\"%11[^\"]\",\"%99[^\"]\",%d,\"%f\"", newEmployee->name, newEmployee->birthdate, newEmployee->address, &newEmployee->addressNumber, &newEmployee->salary);
-        newEmployee->next = NULL;
+        sscanf(line, "%99[^,],%99[^,],%19[^,], %d, \"R$ %f\"", newEmployee->name, newEmployee->birthdate, newEmployee->address,  &newEmployee->addressNumber , &newEmployee->salary  );
+              newEmployee->salary = newEmployee->salary * 1000;
+        newEmployee->next = NULL; 
         newEmployee->prev = NULL;
 
         insertEmployee(&head, newEmployee);
@@ -144,14 +156,16 @@ int main() {
 
    salar (head);
 
-
+        
         float valormin, valormax;
+        
+        //float valormin1, valormax1;
     printf("Digite o valor minimo do intervalo salarial: ");
     scanf("%f", &valormin);
+     
     printf("Digite o valor maximo do intervalo salarial: ");
     scanf("%f", &valormax);
-
-
+    
 
     searchBySalaryRange(head, valormin, valormax);
 
@@ -162,7 +176,7 @@ int main() {
 
       //  displayEmployeesSortedByName(head);
 
-
+//16;30
    
 
     printf ("\n\n FUNCIONARIOS EM ORDEM ALFABETICA Z - A\n \n");
