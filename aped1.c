@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
+#include <math.h>
 
 // Estrutura para representar um funcionário
  struct Employee {
@@ -272,26 +272,20 @@ void freeAVL(struct AVLNode* root) {
 
 // Função para pesquisar funcionários por intervalo salarial em uma árvore AVL
 void searchBySalaryRangeAVL(struct AVLNode* root, float valormin, float valormax) {
-    if (root != NULL) {
-        // Se o salário estiver dentro do intervalo, imprime as informações do funcionário
-        if (root->employee->salary >= valormin && root->employee->salary <= valormax) {
-            printf("Nome: %s, Endereço: %s, Data de Nascimento: %s, Salário: %.2f\n",
-                   root->employee->name, root->employee->address, root->employee->birthdate, root->employee->salary);
-        }
-
-        // Se o salário mínimo for menor que o salário do nó atual, busca na subárvore esquerda
-        if (valormin < root->employee->salary) {
-            searchBySalaryRangeAVL(root->left, valormin, valormax);
-        }
-
-        // Se o salário máximo for maior que o salário do nó atual, busca na subárvore direita
-        if (valormax > root->employee->salary) {
-            searchBySalaryRangeAVL(root->right, valormin, valormax);
-        }
+    if (root == NULL) {
+        return;
     }
+
+    searchBySalaryRangeAVL(root->left, valormin, valormax);
+
+    if (root->employee->salary >= valormin && root->employee->salary <= valormax) {
+        printf("Nome: %s, Endereço: %s, Data de Nascimento: %s, Salário: %.2f\n",
+               root->employee->name, root->employee->address, root->employee->birthdate, root->employee->salary);
+    }
+
+    searchBySalaryRangeAVL(root->right, valormin, valormax);
 }
 
-// Função auxiliar para calcular a idade com base na data de nascimento
 // Função auxiliar para calcular a idade com base na data de nascimento
 int calculateAge(const char* birthdate) {
     time_t now = time(NULL);
@@ -444,6 +438,7 @@ int main() {
 
 
  system ("cls");
+ 
  int opcao;
   
      printf ("1 - Intervalo Salarial \n 2 - DE A-Z \n 3- DE Z-A \n 4- Transformar EM AVL \n 5- Sair \n DIGITE A OPCAO DESEJADA:");
