@@ -3,164 +3,164 @@
 #include <string.h>
 
 // Definição da estrutura do nó da árvore binária
-typedef struct TreeNode {
-    char name[100];
+typedef struct NoArvore {
+    char nome[100];
     int ra;
-    struct TreeNode *left;
-    struct TreeNode *right;
-} TreeNode;
+    struct NoArvore *esquerda;
+    struct NoArvore *direita;
+} NoArvore;
 
 // Função para criar um novo nó
-TreeNode* createNode(char *name, int ra) {
-    TreeNode *newNode = (TreeNode*)malloc(sizeof(TreeNode));
-    strcpy(newNode->name, name);
-    newNode->ra = ra;
-    newNode->left = newNode->right = NULL;
-    return newNode;
+NoArvore* criarNo(char *nome, int ra) {
+    NoArvore *novoNo = (NoArvore*)malloc(sizeof(NoArvore));
+    strcpy(novoNo->nome, nome);
+    novoNo->ra = ra;
+    novoNo->esquerda = novoNo->direita = NULL;
+    return novoNo;
 }
 
 // Função para inserir um nó na árvore ordenada por RA
-TreeNode* insertByRA(TreeNode *root, char *name, int ra) {
-    if (root == NULL)
-        return createNode(name, ra);
-    if (ra < root->ra)
-        root->left = insertByRA(root->left, name, ra);
+NoArvore* inserirPorRA(NoArvore *raiz, char *nome, int ra) {
+    if (raiz == NULL)
+        return criarNo(nome, ra);
+    if (ra < raiz->ra)
+        raiz->esquerda = inserirPorRA(raiz->esquerda, nome, ra);
     else
-        root->right = insertByRA(root->right, name, ra);
-    return root;
+        raiz->direita = inserirPorRA(raiz->direita, nome, ra);
+    return raiz;
 }
 
 // Função para inserir um nó na árvore ordenada por nome
-TreeNode* insertByName(TreeNode *root, char *name, int ra) {
-    if (root == NULL)
-        return createNode(name, ra);
-    if (strcmp(name, root->name) < 0)
-        root->left = insertByName(root->left, name, ra);
+NoArvore* inserirPorNome(NoArvore *raiz, char *nome, int ra) {
+    if (raiz == NULL)
+        return criarNo(nome, ra);
+    if (strcmp(nome, raiz->nome) < 0)
+        raiz->esquerda = inserirPorNome(raiz->esquerda, nome, ra);
     else
-        root->right = insertByName(root->right, name, ra);
-    return root;
+        raiz->direita = inserirPorNome(raiz->direita, nome, ra);
+    return raiz;
 }
 
 // Função para imprimir a árvore em ordem
-void inorder(TreeNode *root) {
-    if (root != NULL) {
-        inorder(root->left);
-        printf("%d, %s\n", root->ra, root->name);
-        inorder(root->right);
+void imprimirEmOrdem(NoArvore *raiz) {
+    if (raiz != NULL) {
+        imprimirEmOrdem(raiz->esquerda);
+        printf("%d, %s\n", raiz->ra, raiz->nome);
+        imprimirEmOrdem(raiz->direita);
     }
 }
 
 // Função para imprimir a árvore em ordem reversa
-void reverseOrder(TreeNode *root) {
-    if (root != NULL) {
-        reverseOrder(root->right);
-        printf("%d, %s\n", root->ra, root->name);
-        reverseOrder(root->left);
+void imprimirEmOrdemReversa(NoArvore *raiz) {
+    if (raiz != NULL) {
+        imprimirEmOrdemReversa(raiz->direita);
+        printf("%d, %s\n", raiz->ra, raiz->nome);
+        imprimirEmOrdemReversa(raiz->esquerda);
     }
 }
 
 // Função para buscar um nó na árvore por RA
-TreeNode* searchByRA(TreeNode *root, int ra) {
-    if (root == NULL || root->ra == ra)
-        return root;
-    if (ra < root->ra)
-        return searchByRA(root->left, ra);
-    return searchByRA(root->right, ra);
+NoArvore* buscarPorRA(NoArvore *raiz, int ra) {
+    if (raiz == NULL || raiz->ra == ra)
+        return raiz;
+    if (ra < raiz->ra)
+        return buscarPorRA(raiz->esquerda, ra);
+    return buscarPorRA(raiz->direita, ra);
 }
 
 // Função para buscar um nó na árvore por nome
-TreeNode* searchByName(TreeNode *root, char *name) {
-    if (root == NULL || strcmp(root->name, name) == 0)
-        return root;
-    if (strcmp(name, root->name) < 0)
-        return searchByName(root->left, name);
-    return searchByName(root->right, name);
+NoArvore* buscarPorNome(NoArvore *raiz, char *nome) {
+    if (raiz == NULL || strcmp(raiz->nome, nome) == 0)
+        return raiz;
+    if (strcmp(nome, raiz->nome) < 0)
+        return buscarPorNome(raiz->esquerda, nome);
+    return buscarPorNome(raiz->direita, nome);
 }
 
 // Função para carregar dados do arquivo CSV
-TreeNode* loadData(char *filename, int orderBy) {
-    FILE *file = fopen(filename, "r");
-    if (!file) {
+void carregarDados(char *nomeArquivo, NoArvore **raizRA, NoArvore **raizNome) {
+    FILE *arquivo = fopen(nomeArquivo, "r");
+    if (!arquivo) {
         printf("Erro ao abrir o arquivo.\n");
         exit(1);
     }
 
-    TreeNode *root = NULL;
-    char line[150];
-    char name[100];
+    char linha[150];
+    char nome[100];
     int ra;
 
     // Ignora a primeira linha (cabeçalho)
-    fgets(line, sizeof(line), file);
+    fgets(linha, sizeof(linha), arquivo);
 
-    while (fgets(line, sizeof(line), file)) {
+    while (fgets(linha, sizeof(linha), arquivo)) {
         // Remove nova linha, se presente
-        line[strcspn(line, "\r\n")] = 0;
-        sscanf(line, "%d,%[^\n]", &ra, name);
-        if (orderBy == 1)
-            root = insertByName(root, name, ra);
-        else
-            root = insertByRA(root, name, ra);
+        linha[strcspn(linha, "\r\n")] = 0;
+        sscanf(linha, "%d,%[^\n]", &ra, nome);
+        *raizRA = inserirPorRA(*raizRA, nome, ra);
+        *raizNome = inserirPorNome(*raizNome, nome, ra);
     }
 
-    fclose(file);
-    return root;
+    fclose(arquivo);
 }
 
 int main() {
-    int choice, ra, orderBy;
-    char name[100];
-    TreeNode *root = NULL, *result = NULL;
+    int escolha, ra;
+    char nome[100];
+    NoArvore *raizRA = NULL, *raizNome = NULL, *resultado = NULL;
 
-    printf("Escolha o critério de ordenamento da árvore:\n");
-    printf("1. Alfabética por nome\n");
-    printf("2. Crescente por RA\n");
-    scanf("%d", &orderBy);
-
-    root = loadData("nome_RA.csv", orderBy);
+    // Carregar dados e construir as duas árvores
+    carregarDados("nome_RA.csv", &raizRA, &raizNome);
 
     do {
         printf("\nMenu:\n");
-        printf("1. Imprimir a árvore em ordem\n");
-        printf("2. Imprimir a árvore em ordem reversa\n");
-        printf("3. Buscar por RA\n");
-        printf("4. Buscar por nome\n");
-        printf("5. Sair\n");
-        printf("Escolha uma opção: ");
-        scanf("%d", &choice);
+        printf("1. Imprimir a Arvore ordenada por RA em ordem\n");
+        printf("2. Imprimir a Arvore ordenada por RA em ordem reversa\n");
+        printf("3. Imprimir a Arvore ordenada por Nome em ordem\n");
+        printf("4. Imprimir a Arvore ordenada por Nome em ordem reversa\n");
+        printf("5. Buscar por RA\n");
+        printf("6. Buscar por Nome\n");
+        printf("7. Sair\n");
+        printf("Escolha uma opcao: ");
+        scanf("%d", &escolha);
 
-        switch (choice) {
+        switch (escolha) {
             case 1:
-                inorder(root);
+                imprimirEmOrdem(raizRA);
                 break;
             case 2:
-                reverseOrder(root);
+                imprimirEmOrdemReversa(raizRA);
                 break;
             case 3:
+                imprimirEmOrdem(raizNome);
+                break;
+            case 4:
+                imprimirEmOrdemReversa(raizNome);
+                break;
+            case 5:
                 printf("Digite o RA a ser buscado: ");
                 scanf("%d", &ra);
-                result = searchByRA(root, ra);
-                if (result)
-                    printf("Encontrado: %d, %s\n", result->ra, result->name);
+                resultado = buscarPorRA(raizRA, ra);
+                if (resultado)
+                    printf("Encontrado: %d, %s\n", resultado->ra, resultado->nome);
                 else
                     printf("RA não encontrado.\n");
                 break;
-            case 4:
+            case 6:
                 printf("Digite o nome a ser buscado: ");
-                scanf(" %[^\n]", name);
-                result = searchByName(root, name);
-                if (result)
-                    printf("Encontrado: %d, %s\n", result->ra, result->name);
+                scanf(" %[^\n]", nome);
+                resultado = buscarPorNome(raizNome, nome);
+                if (resultado)
+                    printf("Encontrado: %d, %s\n", resultado->ra, resultado->nome);
                 else
                     printf("Nome não encontrado.\n");
                 break;
-            case 5:
+            case 7:
                 printf("Saindo...\n");
                 break;
             default:
                 printf("Opção inválida.\n");
         }
-    } while (choice != 5);
+    } while (escolha != 7);
 
     return 0;
 }
